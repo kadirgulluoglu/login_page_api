@@ -6,6 +6,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class CacheManager {
   static final _storage = FlutterSecureStorage();
 
+  static Future deleteAll() async {
+    await _storage.deleteAll();
+  }
+
   static Future setUsername(String userName) async {
     await _storage.write(key: CacheManagerKeys.username.name, value: userName);
   }
