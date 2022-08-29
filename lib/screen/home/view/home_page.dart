@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hardwareders/core/cache/cache_manager.dart';
+import 'package:provider/provider.dart';
 
-import '../../product/components/custom_card.dart';
-import '../login/model/user_model.dart';
+import '../../../core/components/custom_elevated_button.dart';
+import '../../../product/components/custom_card.dart';
+import '../../login/model/user_model.dart';
+import '../../login/view/login_page.dart';
+import '../../login/viewmodel/login_viewmodel.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key, required this.userModel}) : super(key: key);
@@ -37,15 +42,29 @@ class _HomeViewState extends State<HomeView> {
                   .copyWith(color: Colors.blueGrey),
             ),
             SizedBox(height: 30),
-            buildCard(
+            BuildCard(
                 title: "Name Surname",
                 subtitle: '${userModel.firstName} ${userModel.lastName}'),
-            buildCard(title: 'Gender', subtitle: '${userModel.gender}'),
-            buildCard(title: 'Mail', subtitle: '${userModel.email}'),
+            BuildCard(title: 'Gender', subtitle: '${userModel.gender}'),
+            BuildCard(title: 'Mail', subtitle: '${userModel.email}'),
+            CustomElevatedButton(
+              onPressed: () => onPressedLogOut(context),
+              title: 'Çıkış Yap',
+            )
           ],
         ),
       ),
     );
+  }
+
+  onPressedLogOut(BuildContext context) {
+    CacheManager.deleteAll();
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+      builder: (context) => ChangeNotifierProvider(
+        create: (_) => LoginViewModel(),
+        child: const Login(),
+      ),
+    ));
   }
 
   AppBar buildAppBar() {
