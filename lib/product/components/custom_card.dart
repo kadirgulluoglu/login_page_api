@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/init/theme/theme.dart';
+import '../../core/init/theme/theme.dart';
 
 class buildCard extends StatelessWidget {
   const buildCard({

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../product/custom_card.dart';
+import '../../product/components/custom_card.dart';
 import '../login/model/user_model.dart';
 
 class HomeView extends StatefulWidget {
