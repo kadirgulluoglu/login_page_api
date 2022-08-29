@@ -281,7 +281,7 @@ class _LoginState extends State<Login> {
               checkColor: Colors.white,
               activeColor: primary,
               onChanged: (value) {
-                viewModel.rememberMe = value! ?? false;
+                viewModel.rememberMe = value ?? false;
               },
             ),
           ),
@@ -339,7 +339,6 @@ class _LoginState extends State<Login> {
       viewModel.changeLoading();
       _formkey.currentState?.save();
       bool hasData = await viewModel.fetchUserLogin(username, password);
-
       if (hasData) {
         navigateHome(viewModel);
       } else {
