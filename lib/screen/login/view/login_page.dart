@@ -338,13 +338,9 @@ class _LoginState extends State<Login> {
     if (_formkey.currentState?.validate() ?? false) {
       viewModel.changeLoading();
       _formkey.currentState?.save();
-      await viewModel.fetchUserLogin(username, password);
+      bool hasData = await viewModel.fetchUserLogin(username, password);
 
-      if (viewModel.userModel != null) {
-        if (viewModel.rememberMe) {
-          await CacheManager.setUsername(username);
-          await CacheManager.setPassword(password);
-        }
+      if (hasData) {
         navigateHome(viewModel);
       } else {
         viewModel.changeLoading();
