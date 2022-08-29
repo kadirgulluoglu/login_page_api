@@ -8,11 +8,32 @@ import '../model/user_request_model.dart';
 
 class LoginViewModel with ChangeNotifier {
   late final LoginService loginService;
+  bool isObscure = true;
+  bool isLoading = false;
+  bool _rememberMe = false;
+
+  bool get rememberMe => _rememberMe;
+
+  set rememberMe(bool value) {
+    _rememberMe = value;
+    notifyListeners();
+  }
+
   StateStatus _stateStatus = StateStatus.busy;
   StateStatus get stateStatus => _stateStatus;
 
   set stateStatus(StateStatus value) {
     _stateStatus = value;
+    notifyListeners();
+  }
+
+  changeObscure() {
+    isObscure = !isObscure;
+    notifyListeners();
+  }
+
+  changeLoading() {
+    isLoading = !isLoading;
     notifyListeners();
   }
 
@@ -27,7 +48,15 @@ class LoginViewModel with ChangeNotifier {
       final response = await loginService.requestData(
           UserRequestModel(username: username, password: password));
       userModel = response;
-      return userModel != null ? true : false;
+      if (userModel != null) {
+        if (rememberMe) {
+          await CacheManager.setUsername(username);
+          await CacheManager.setPassword(password);
+        }
+        return true;
+      } else {
+        return false;
+      }
     } on Exception catch (e) {
       print(e);
     }
@@ -36,8 +65,6 @@ class LoginViewModel with ChangeNotifier {
   getUserFromCache() async {
     final String? userName = await CacheManager.getUsername();
     final String? password = await CacheManager.getPassword();
-    print(userName);
-    print(password);
     if (userName != null && password != null) {
       bool hasData = await fetchUserLogin(userName, password);
 

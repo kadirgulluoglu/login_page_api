@@ -15,12 +15,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  bool beniHatirla = false;
-  bool isObscure = true;
-  bool isLoading = false;
-
   final _formkey = GlobalKey<FormState>();
-
   //editingcontroller
   late final TextEditingController _emailcontroller;
   late final TextEditingController _passwordcontroller;
@@ -74,9 +69,9 @@ class _LoginState extends State<Login> {
                         SizedBox(height: size.height * 0.10),
                         buildEposta(),
                         SizedBox(height: size.height * 0.02),
-                        buildSifre(),
+                        buildSifre(viewModel),
                         buildSifrenimiunuttun(),
-                        buildRememberMe(),
+                        buildRememberMe(viewModel),
                         SizedBox(height: size.height * 0.02),
                         buildLoginButton(viewModel),
                         buildSignupButton(),
@@ -86,7 +81,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
             ),
-            isLoading
+            viewModel.isLoading
                 ? Positioned.fill(
                     child: Container(
                     color: Colors.black.withOpacity(0.3),
@@ -182,7 +177,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget buildSifre() {
+  Widget buildSifre(LoginViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -224,7 +219,7 @@ class _LoginState extends State<Login> {
             },
             autofocus: false,
             controller: _passwordcontroller,
-            obscureText: isObscure,
+            obscureText: viewModel.isObscure,
             textInputAction: TextInputAction.done,
             style: const TextStyle(
               color: Colors.white,
@@ -238,12 +233,12 @@ class _LoginState extends State<Login> {
                 ),
                 suffixIcon: IconButton(
                   onPressed: () {
-                    setState(() {
-                      isObscure = !isObscure;
-                    });
+                    viewModel.changeObscure();
                   },
                   icon: Icon(
-                    isObscure ? Icons.visibility : Icons.visibility_off,
+                    viewModel.isObscure
+                        ? Icons.visibility
+                        : Icons.visibility_off,
                     color: Colors.white,
                   ),
                 ),
@@ -272,7 +267,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget buildRememberMe() {
+  Widget buildRememberMe(LoginViewModel viewModel) {
     return SizedBox(
       height: 30,
       child: Row(
@@ -282,13 +277,11 @@ class _LoginState extends State<Login> {
               unselectedWidgetColor: primary,
             ),
             child: Checkbox(
-              value: beniHatirla,
+              value: viewModel.rememberMe,
               checkColor: Colors.white,
               activeColor: primary,
               onChanged: (value) {
-                setState(() {
-                  beniHatirla = value!;
-                });
+                viewModel.rememberMe = value! ?? false;
               },
             ),
           ),
@@ -341,26 +334,20 @@ class _LoginState extends State<Login> {
     );
   }
 
-  changeLoading() {
-    setState(() {
-      isLoading = !isLoading;
-    });
-  }
-
   void login(LoginViewModel viewModel, String username, String password) async {
-    if (_formkey.currentState!.validate()) {
-      changeLoading();
+    if (_formkey.currentState?.validate() ?? false) {
+      viewModel.changeLoading();
       _formkey.currentState?.save();
       await viewModel.fetchUserLogin(username, password);
 
       if (viewModel.userModel != null) {
-        if (beniHatirla) {
+        if (viewModel.rememberMe) {
           await CacheManager.setUsername(username);
           await CacheManager.setPassword(password);
         }
         navigateHome(viewModel);
       } else {
-        changeLoading();
+        viewModel.changeLoading();
       }
     }
   }
