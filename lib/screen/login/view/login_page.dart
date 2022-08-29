@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hardwareders/core/enum/state_enum.dart';
 import 'package:provider/provider.dart';
 import '../../../core/cache/cache_manager.dart';
 import '../../../core/components/custom_elevated_button.dart';
 import '../../../core/init/theme/theme.dart';
-import '../../home/home_page.dart';
+import '../../home/view/home_page.dart';
 import '../viewmodel/login_viewmodel.dart';
 
 class Login extends StatefulWidget {
@@ -43,6 +44,14 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<LoginViewModel>(context);
     Size size = MediaQuery.of(context).size;
+    return viewModel.stateStatus == StateStatus.busy
+        ? buildCircularProgressIndicator()
+        : viewModel.stateStatus == StateStatus.error
+            ? buildLogin(size, viewModel)
+            : HomeView(userModel: viewModel.userModel);
+  }
+
+  Scaffold buildLogin(Size size, LoginViewModel viewModel) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: GestureDetector(
@@ -56,21 +65,12 @@ class _LoginState extends State<Login> {
               ),
               child: Form(
                 key: _formkey,
-                child: Column(
+                child: Stack(
                   children: [
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(
-                          width: size.width * 0.6,
-                          child: FittedBox(
-                            child: Text(
-                              _titleLogin,
-                              style: TextStyle(
-                                  color: primary, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
+                        buildLoginText(size),
                         SizedBox(height: size.height * 0.10),
                         buildEposta(),
                         SizedBox(height: size.height * 0.02),
@@ -78,23 +78,45 @@ class _LoginState extends State<Login> {
                         buildSifrenimiunuttun(),
                         buildRememberMe(),
                         SizedBox(height: size.height * 0.02),
-                        isLoading
-                            ? Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 25),
-                                child: CircularProgressIndicator(
-                                  color: primary,
-                                ),
-                              )
-                            : buildLoginButton(viewModel),
+                        buildLoginButton(viewModel),
                         buildSignupButton(),
                       ],
                     ),
                   ],
                 ),
               ),
-            )
+            ),
+            isLoading
+                ? Positioned.fill(
+                    child: Container(
+                    color: Colors.black.withOpacity(0.3),
+                    child: Center(
+                        child: CircularProgressIndicator(color: primary)),
+                  ))
+                : const SizedBox.shrink(),
           ],
+        ),
+      ),
+    );
+  }
+
+  SizedBox buildLoginText(Size size) {
+    return SizedBox(
+      width: size.width * 0.6,
+      child: FittedBox(
+        child: Text(
+          _titleLogin,
+          style: TextStyle(color: primary, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Material buildCircularProgressIndicator() {
+    return Material(
+      child: Center(
+        child: CircularProgressIndicator(
+          color: primary,
         ),
       ),
     );
@@ -332,8 +354,10 @@ class _LoginState extends State<Login> {
       await viewModel.fetchUserLogin(username, password);
 
       if (viewModel.userModel != null) {
-        await CacheManager.setUsername(username);
-        await CacheManager.setPassword(password);
+        if (beniHatirla) {
+          await CacheManager.setUsername(username);
+          await CacheManager.setPassword(password);
+        }
         navigateHome(viewModel);
       } else {
         changeLoading();
