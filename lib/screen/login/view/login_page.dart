@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hardwareders/core/enum/state_enum.dart';
 import 'package:provider/provider.dart';
-import '../../../core/cache/cache_manager.dart';
 import '../../../core/components/custom_elevated_button.dart';
 import '../../../core/init/theme/theme.dart';
 import '../../home/view/home_page.dart';
@@ -34,7 +33,7 @@ class _LoginState extends State<Login> {
     _passwordcontroller = TextEditingController();
     _emailcontroller = TextEditingController();
   }
-
+  //TODO deneme
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<LoginViewModel>(context);
@@ -45,7 +44,6 @@ class _LoginState extends State<Login> {
             ? buildLogin(size, viewModel)
             : HomeView(userModel: viewModel.userModel);
   }
-
   Scaffold buildLogin(Size size, LoginViewModel viewModel) {
     return Scaffold(
       backgroundColor: Colors.white,
